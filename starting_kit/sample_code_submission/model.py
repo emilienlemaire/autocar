@@ -3,11 +3,18 @@ Sample predictive model.
 You must supply at least 4 methods:
 - fit: trains the model.
 - predict: uses the model to perform predictions.
+- save: saves the model.
+- load: reloads the model.
 '''
+import pickle
 import numpy as np   # We recommend to use numpy arrays
 from os.path import isfile
 from sklearn.base import BaseEstimator
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import RidgeCV
+from sklearn.svm import LinearSVR
+#from sklearn.ensemble import StackingRegressor
+#from sklearn.tree import DecisionTreeRegressor
 
 class model (BaseEstimator):
     def __init__(self):
@@ -15,11 +22,23 @@ class model (BaseEstimator):
         This constructor is supposed to initialize data members.
         Use triple quotes for function documentation. 
         '''
-        self.num_train_samples=0
-        self.num_feat=1
-        self.num_labels=1
+        self.num_train_samples=1
+        self.num_feat=0
+        self.num_labels=0
         self.is_trained=False
-        self.mod = RandomForestRegressor(max_depth=20, random_state=0,  n_estimators=100) # Initalizing the model 
+        self.mod = RandomForestRegressor(max_depth=100, random_state=0,  n_estimators=10) # Initalizing the model 
+        ''' 
+       estimators = 
+            [
+            ('lr', RidgeCV()),
+            ('svr', LinearSVR(random_state=42))
+            ]
+        self.mod = StackingRegressor(
+            estimators=estimators,
+            final_estimator=RandomForestRegressor(n_estimators=10,
+                                                  random_state=42)
+            )
+        '''
     
     def fit(self, X, y):
         '''
@@ -69,14 +88,13 @@ class model (BaseEstimator):
         y = self.mod.predict(X)
         return y
 
-    def save(self, outname='model'):
-        ''' Placeholder function.
-            Save the trained model to avoid re-training in the future.
-        '''
-        pass
-        
-    def load(self):
-        ''' Placeholder function.
-            Load a previously saved trained model to avoid re-training.
-        '''
-        pass
+    def save(self, path="./"):
+        pickle.dump(self, open(path + '_model.pickle', "wb"))
+
+    def load(self, path="./"):
+        modelfile = path + '_model.pickle'
+        if isfile(modelfile):
+            with open(modelfile, 'rb') as f:
+                self = pickle.load(f)
+            print("Model reloaded from: " + modelfile)
+        return self
