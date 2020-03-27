@@ -1,2 +1,2 @@
-set1_score: 0.993076251119
+set1_score: 0.993010673363
 Duration: 0

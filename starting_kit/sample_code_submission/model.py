@@ -1,30 +1,28 @@
+from os.path import isfile
 import numpy as np
 import pickle
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.base import BaseEstimator
-from os.path import isfile
-
 
 class preprocessing ():
-    def __init__(self):
-        self.scaler = MinMaxScaler(feature_range=(0,1))
+    def __init__(self, n_comp):
+        self.scaler = MinMaxScaler()
         self.fit = None
-    
+
     def fit_transform(self, X, y=None):
         self.fit = self.scaler.fit(X, y=y)
-        X_scaled = self.scaler.fit_transform(X, y=y)
-
+        X_scaled = self.scaler.transform(X)
+        
         return X_scaled
     
     def transform(self, X, y=None):
-        if self.fit == None:
-            self.fit = self.scaler.fit(X, y=y)
+        self.fit = self.scaler.fit(X, y=y)
         X_scaled = self.scaler.transform(X)
 
         return X_scaled
 
-class model (BaseEstimator):
+class model(BaseEstimator):
     def __init__(self):
         '''
         This constructor is supposed to initialize data members.
@@ -34,7 +32,7 @@ class model (BaseEstimator):
         self.num_feat = 59
         self.num_labels = 1
         self.is_trained = False
-        self.preprocess = preprocessing()
+        self.preprocess = preprocessing(59)
         self.mod = RandomForestRegressor(n_estimators=60)
 
     def fit(self, X, y):
