@@ -7,24 +7,52 @@ from os.path import isfile
 
 
 class preprocessing ():
+    '''
+    This class is the preprocessing class of our model.
+    It only scales the data (from 0. to 1.) as in our tests
+    we found out that outlier detection and dimension reduction
+    reduced our scores on the test data.
+    '''
     def __init__(self):
-        self.scaler = MinMaxScaler(feature_range=(0,1))
+        '''
+        This constructor initialize the scaler and set the
+        fit function to none
+        '''
+        self.scaler = MinMaxScaler(feature_range=(0, 1))
         self.fit = None
     
-    def fit_transform(self, X, y=None):
+    def fit(self, X, y=None):
+        '''
+        This function fit the scaler model to the X data of the arguments
+        '''
         self.fit = self.scaler.fit(X, y=y)
-        X_scaled = self.scaler.fit_transform(X, y=y)
 
-        return X_scaled
-    
-    def transform(self, X, y=None):
+    def fit_transform(self, X, y=None):
+        '''
+        This function train the scaler and returns the scaled data
+        '''
         if self.fit == None:
             self.fit = self.scaler.fit(X, y=y)
         X_scaled = self.scaler.transform(X)
 
         return X_scaled
+    
+    def transform(self, X, y=None):
+        '''
+        This functions returns the scaled version of the X data
+        '''
+        return self.scaler.transform(X)
+
 
 class model (BaseEstimator):
+    '''
+    This class is our model. We choose the RandomForestRegressor model
+    as it gave us the best scores overhall during our tests. The arguments of
+    the model are as follow:
+        n_estimators=60
+    We found out that these arguments gave us the best score for our
+    RandomForestRegressor.
+    '''
     def __init__(self):
         '''
         This constructor is supposed to initialize data members.
