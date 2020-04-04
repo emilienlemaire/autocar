@@ -2,3 +2,5 @@
 *.pickle
 
 .vim/
+
+._Report.pdf
