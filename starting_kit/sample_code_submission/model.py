@@ -82,7 +82,6 @@ class model (BaseEstimator):
             y: Training label matrix of dim num_train_samples * num_labels.
         Both inputs are numpy arrays.
         '''
-
         self.num_train_samples = X.shape[0]
         if X.ndim > 1: self.num_feat= X.shape[1]
         print("FIT: dim(X)= [{:d}, {:d}]".format(self.num_train_samples, self.num_feat))
@@ -127,9 +126,39 @@ class model (BaseEstimator):
                 print("Model reloaded from: " + modelfile)
         return self
 
+
+import numpy as np
+from sklearn.datasets import make_regression
+
 def test():
     mod = model()
-
+    preproc = preprocessing()
+    # Test du preprocessing
+    X_train = np.array([[ 1., -1.,  2.],
+                        [ 2.,  0.,  0.],
+                        [ 0.,  1., -1.]])
+    # Test preprocess.fit()
+    X_preproc = preproc.fit(X_train)
+    assert X_preproc is None, "Fit is returning a modified version"
+    # Test preprocess.transform()
+    X_preproc = preproc.transform(X_train)
+    assert np.array_equal(X_preproc, np.array([[0.5       , 0.        , 1.        ],
+                                               [1.        , 0.5       , 1./3.],
+                                               [0.        , 1.        , 0.        ]])), "Transform not going right, result: {}".format(X_preproc)
+    # Test preprocessing.fit_transform()
+    preproc = preprocessing()
+    X_preproc = preproc.fit_transform(X_train)
+    assert np.array_equal(X_preproc, np.array([[0.5       , 0.        , 1.        ],
+                                               [1.        , 0.5       , 1./3.],
+                                               [0.        , 1.        , 0.        ]])), "Fit transform not going right, result: {}".format(X_preproc)
+    X, y = make_regression(n_features=4, n_informative=2,
+                       random_state=0, shuffle=False)
+    # Test de model.fit()
+    mod.fit(X,y)
+    
+    # Test de model.predict
+    print("Prediction:", mod.predict(np.array([[0, 0, 0, 0]])))
 
 if __name__ == "__main__":
     test()
+    print("All test passed successfully")
